@@ -198,7 +198,7 @@
             </div>
         </header>
 
-        <div id="chat-window" id="chatWindow">
+        <div id="chat-window">
             <!-- Mensagens do chat aparecerão aqui -->
         </div>
 
@@ -210,7 +210,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO: Insira a sua chave API do Gemini aqui antes de enviar para o GitHub
+        // CONFIGURAÇÃO: Certifique-se de manter a sua chave API válida aqui
         const GEMINI_API_KEY = "SUA_CHAVE_API_AQUI"; 
         
         const chatWindow = document.getElementById('chat-window');
@@ -218,11 +218,15 @@
         const sendBtn = document.getElementById('send-btn');
         const micBtn = document.getElementById('mic-btn');
 
-        // Histórico do Chat para o Gemini manter o contexto
+        // Histórico estruturado corretamente para a API do Gemini
         let chatHistory = [
             {
                 role: "user",
-                parts: [{ text: "You are 'Weather Chatbot', a friendly AI English coach helping me practice English. Our topic is strictly 'Money' (saving, spending, investing, budgeting). You must only reply in English (en-US). Keep your replies concise, simple, natural, and encourage the conversation by asking questions about money. Start by welcoming me." }]
+                parts: [{ text: "You are 'Weather Chatbot', a friendly AI English coach helping me practice English. Our topic is strictly 'Money' (saving, spending, investing, budgeting). You must only reply in English (en-US). Keep your replies short, natural, and encourage the conversation by asking questions about money." }]
+            },
+            {
+                role: "model",
+                parts: [{ text: "Hello! I am your Weather Chatbot. Let's practice English! How do you usually manage your money? Do you prefer saving or spending?" }]
             }
         ];
 
@@ -253,10 +257,8 @@
             };
         } else {
             micBtn.style.display = 'none';
-            console.log("Reconhecimento de voz não suportado neste navegador.");
         }
 
-        // Alternar gravação do microfone
         micBtn.addEventListener('click', () => {
             if (!recognition) return;
             if (isRecording) {
@@ -270,7 +272,7 @@
             isRecording = true;
             micBtn.innerHTML = "🛑";
             micBtn.classList.add('recording');
-            window.speechSynthesis.cancel(); // Para o bot se ele estiver a falar
+            window.speechSynthesis.cancel(); 
             recognition.start();
         }
 
@@ -280,7 +282,6 @@
             micBtn.classList.remove('recording');
         }
 
-        // Enviar Mensagem
         sendBtn.addEventListener('click', sendMessage);
         textInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
@@ -307,7 +308,7 @@
             } catch (error) {
                 console.error(error);
                 setLoading(false);
-                appendMessage("Sorry, I had trouble connecting. Please check your API key.", 'bot');
+                appendMessage("Sorry, I had trouble connecting. Please verify your API Key or connection.", 'bot');
             }
         }
 
