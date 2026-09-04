@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Weather Chatbot - Practice English</title>
+    <title>Money Talk - Weather Chatbot</title>
     <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --chat-bg: #e5ddd5;
+            --primary: #0088cc;
+            --user-msg: #d9fdd3;
+            --bot-msg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,57 +24,59 @@
         }
 
         body {
-            background-color: #f0f2f5;
+            background-color: var(--bg-color);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             height: -webkit-fill-available;
-            color: #333;
+            overflow: hidden;
         }
 
-        .chat-container {
+        #chat-container {
             width: 100%;
             max-width: 480px;
-            height: 100vh;
-            background-color: #ffffff;
+            height: 100%;
+            background-color: var(--chat-bg);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
         }
 
         @media (min-width: 481px) {
-            .chat-container {
+            #chat-container {
                 height: 90vh;
                 border-radius: 12px;
                 overflow: hidden;
             }
         }
 
-        .chat-header {
-            background-color: #075e54;
+        header {
+            background-color: var(--primary);
             color: white;
             padding: 16px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
             z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .chat-header span {
-            display: block;
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        header p {
             font-size: 0.8rem;
-            font-weight: normal;
-            opacity: 0.8;
-            margin-top: 4px;
+            opacity: 0.9;
         }
 
-        .chat-messages {
+        #chat-window {
             flex: 1;
             padding: 16px;
             overflow-y: auto;
-            background-color: #efeae2;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -72,223 +84,241 @@
         }
 
         .message {
-            max-width: 75%;
+            max-width: 80%;
             padding: 10px 14px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 0.95rem;
             line-height: 1.4;
+            position: relative;
             word-wrap: break-word;
             animation: fadeIn 0.2s ease-in-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .message.bot {
-            background-color: #ffffff;
-            align-self: flex-start;
-            border-top-left-radius: 0;
-            color: #000000;
-        }
-
-        .message.user {
-            background-color: #d9fdd3;
+        .user {
+            background-color: var(--user-msg);
             align-self: flex-end;
-            border-top-right-radius: 0;
-            color: #000000;
+            border-top-right-radius: 2px;
+            color: #111;
         }
 
-        .chat-input-area {
-            background-color: #f0f2f5;
+        .bot {
+            background-color: var(--bot-msg);
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+            color: var(--text-main);
+            padding-right: 36px;
+        }
+
+        .repeat-btn {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            opacity: 0.6;
+            padding: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .repeat-btn:active, .repeat-btn:hover {
+            opacity: 1;
+        }
+
+        #input-area {
+            background-color: #f0f0f0;
             padding: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
-            border-top: 1px solid #e0e0e0;
+            min-height: 60px;
         }
 
-        .input-wrapper {
+        #text-input {
             flex: 1;
-            position: relative;
-            display: flex;
-            background-color: white;
+            border: none;
             border-radius: 24px;
-            padding: 4px 12px;
-            align-items: center;
-            border: 1px solid #e0e0e0;
-        }
-
-        .chat-input {
-            width: 100%;
-            border: none;
-            outline: none;
-            padding: 8px 4px;
+            padding: 12px 16px;
             font-size: 1rem;
-            background: transparent;
-        }
-
-        .btn {
-            background: none;
-            border: none;
-            cursor: pointer;
             outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s ease;
+            background: white;
+            max-height: 120px;
         }
 
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-mic {
-            width: 42px;
-            height: 42px;
-            background-color: #075e54;
+        .action-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
             border-radius: 50%;
+            background-color: var(--primary);
             color: white;
             font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.2s;
             flex-shrink: 0;
         }
 
-        .btn-mic.recording {
+        .action-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        #mic-btn.recording {
             background-color: #ea4335;
-            animation: pulse 1.2s infinite;
+            animation: pulse 1.2s infinite alternate;
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.5); }
-            70% { box-shadow: 0 0 0 12px rgba(234, 67, 53, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
-        }
-
-        .btn-send {
-            color: #075e54;
-            font-size: 1.4rem;
-            padding: 4px;
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.5); }
+            100% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(234, 67, 53, 0); }
         }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <div class="chat-header">
-            Weather Chatbot
-            <span>Practice your English about the weather!</span>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot">Hello! I am your weather assistant. How is the weather today where you are?</div>
+    <div id="chat-container">
+        <header>
+            <div style="font-size: 2rem;">🤖</div>
+            <div>
+                <h1>Weather Chatbot (Money English Coach)</h1>
+                <p>Pratique inglês sobre finanças e dinheiro</p>
+            </div>
+        </header>
+
+        <div id="chat-window" id="chatWindow">
+            <!-- Mensagens do chat aparecerão aqui -->
         </div>
 
-        <div class="chat-input-area">
-            <div class="input-wrapper">
-                <input type="text" id="chatInput" class="chat-input" placeholder="Type a message in English..." autocomplete="off">
-                <button id="btnSend" class="btn btn-send" title="Send text">➔</button>
-            </div>
-            <button id="btnMic" class="btn btn-mic" title="Speak">🎤</button>
+        <div id="input-area">
+            <button id="mic-btn" class="action-btn" title="Gravar voz">🎤</button>
+            <input type="text" id="text-input" placeholder="Escreva em inglês..." autocomplete="off">
+            <button id="send-btn" class="action-btn" title="Enviar">➔</button>
         </div>
     </div>
 
     <script>
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const btnSend = document.getElementById('btnSend');
-        const btnMic = document.getElementById('btnMic');
+        // CONFIGURAÇÃO: Insira a sua chave API do Gemini aqui antes de enviar para o GitHub
+        const GEMINI_API_KEY = "SUA_CHAVE_API_AQUI"; 
+        
+        const chatWindow = document.getElementById('chat-window');
+        const textInput = document.getElementById('text-input');
+        const sendBtn = document.getElementById('send-btn');
+        const micBtn = document.getElementById('mic-btn');
 
-        const botDatabase = {
-            greetings: [
-                "Hello there! It is great to talk to you. How is the weather right now?",
-                "Hi! I am ready to practice. Tell me, how is the sky looking today?",
-                "Hey! Let's talk about the weather. Is it nice outside?"
-            ],
-            sunny: [
-                "I love sunny days! It is perfect to go for a walk. Don't forget your sunglasses!",
-                "That sounds amazing! Sunny weather always puts me in a good mood. Is it very hot too?",
-                "Great! A clear blue sky is wonderful. Are you planning to do anything outdoors today?"
-            ],
-            rainy: [
-                "Oh, rainy days are perfect for staying inside with a warm cup of tea. Do you have an umbrella?",
-                "I see. Rain is good for the plants, but don't get wet! Is it a heavy rain?",
-                "Rainy weather makes me want to watch a movie. Do you like this kind of day?"
-            ],
-            cloudy: [
-                "Cloudy days can be very cozy, but sometimes they look a bit grey. Do you think it will rain later?",
-                "It is overcast, then! Not too bright, not too dark. Perfect temperature for a run.",
-                "Clouds can make beautiful shapes in the sky. Is it windy as well?"
-            ],
-            cold: [
-                "Brr! Make sure to wear a warm jacket or a nice sweater. Is it freezing?",
-                "Cold days are perfect for hot chocolate. Do you prefer cold or hot weather?",
-                "Stay warm! Winter vibes are in the air. Is it snowing or just cold?"
-            ],
-            hot: [
-                "Wow, stay hydrated! Drink plenty of water. Is it sunny as well?",
-                "That sounds like a perfect beach day! Or maybe staying near the air conditioner?",
-                "Phew! Don't forget your sunscreen. Do you enjoy high temperatures?"
-            ],
-            fallback: [
-                "That is interesting! Tell me more, is it sunny, rainy, or cloudy right now?",
-                "I see! And how does the temperature feel? Is it hot or cold?",
-                "Interesting! Modern weather is full of surprises. Describe the sky for me!",
-                "Nice! I love learning about the weather in different places. What is your favorite season?"
-            ]
-        };
+        // Histórico do Chat para o Gemini manter o contexto
+        let chatHistory = [
+            {
+                role: "user",
+                parts: [{ text: "You are 'Weather Chatbot', a friendly AI English coach helping me practice English. Our topic is strictly 'Money' (saving, spending, investing, budgeting). You must only reply in English (en-US). Keep your replies concise, simple, natural, and encourage the conversation by asking questions about money. Start by welcoming me." }]
+            }
+        ];
 
+        // Configuração de Reconhecimento de Voz (STT)
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
         let isRecording = false;
 
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
-            recognition.continuous = false;
             recognition.lang = 'en-US';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
-            recognition.onstart = () => {
-                isRecording = true;
-                btnMic.classList.add('recording');
-                btnMic.innerHTML = '🛑';
+            recognition.onresult = (event) => {
+                const speechToText = event.results[0][0].transcript;
+                textInput.value = speechToText;
+                sendMessage();
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Erro no reconhecimento de voz:", event.error);
+                stopRecording();
             };
 
             recognition.onend = () => {
-                isRecording = false;
-                btnMic.classList.remove('recording');
-                btnMic.innerHTML = '🎤';
+                stopRecording();
             };
-
-            recognition.onerror = () => {
-                isRecording = false;
-                btnMic.classList.remove('recording');
-                btnMic.innerHTML = '🎤';
-            };
-
-            recognition.onresult = (event) => {
-                const speechToText = event.results[0][0].transcript;
-                chatInput.value = speechToText;
-                handleUserMessage();
-            };
+        } else {
+            micBtn.style.display = 'none';
+            console.log("Reconhecimento de voz não suportado neste navegador.");
         }
 
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                window.speechSynthesis.speak(utterance);
+        // Alternar gravação do microfone
+        micBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                startRecording();
+            }
+        });
+
+        function startRecording() {
+            isRecording = true;
+            micBtn.innerHTML = "🛑";
+            micBtn.classList.add('recording');
+            window.speechSynthesis.cancel(); // Para o bot se ele estiver a falar
+            recognition.start();
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            micBtn.innerHTML = "🎤";
+            micBtn.classList.remove('recording');
+        }
+
+        // Enviar Mensagem
+        sendBtn.addEventListener('click', sendMessage);
+        textInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function sendMessage() {
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            textInput.value = '';
+            appendMessage(text, 'user');
+            
+            chatHistory.push({ role: "user", parts: [{ text: text }] });
+
+            try {
+                setLoading(true);
+                const botReply = await fetchGeminiResponse();
+                setLoading(false);
+
+                appendMessage(botReply, 'bot');
+                chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                speak(botReply);
+
+            } catch (error) {
+                console.error(error);
+                setLoading(false);
+                appendMessage("Sorry, I had trouble connecting. Please check your API key.", 'bot');
             }
         }
 
         function appendMessage(text, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender);
-            messageElement.textContent = text;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', sender);
+            msgDiv.innerText = text;
 
-        function getBotResponse(userText) {
+            if (sender === 'bot') {
+                const repeatBtn = document.createElement('button');
+                repeatBtn.classList.add('repeat-btn');
+                repeatBtn.innerHTML = "🔊";
+                repeatBtn.title = "Repeat audio";
+                repeatBtn.onclick = () => speak(text);
